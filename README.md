@@ -326,28 +326,14 @@ En el desarrollo de este proyecto se utilizaron las siguientes herramientas de I
 ## 💭 Reflexiones Individuales
 
 ### Gabriel Ferrufino
-<!-- 
-⚠️ IMPORTANTE: Esta sección debe ser escrita por Gabriel de forma genuina, 
-sin apoyo de herramientas de IA. Incluir:
-- Qué aprendí durante el semestre sobre DevOps
-- Cuál fue mi contribución principal al proyecto
-- Qué desafíos enfrenté y cómo los resolví
-- Qué haría diferente si empezara de nuevo
--->
-*[Pendiente — escribir reflexión personal sin uso de IA]*
+"Durante este semestre, mi mayor aprendizaje sobre DevOps fue entender la importancia de organizar el código usando la metodología de GitFlow. Me quedó súper claro por qué es vital separar el trabajo en ramas como main, develop y las de nuevas funcionalidades para no romper nada en producción. Mi contribución principal al proyecto se centró en llevar el control de versiones: estuve haciendo los commits, manejando los cambios en mis ramas localmente y creando los Pull Requests para que pudiéramos integrar todo de forma ordenada.
+
+A lo largo del desarrollo, enfrenté varios desafíos, especialmente cuando tuve un problema súper frustrante por inicializar un repositorio de Git dentro de otro, lo que hizo que se dejaran de trackear los archivos. Logré resolver esto borrando los archivos ocultos de git que sobraban y limpiando la caché de Git directamente desde la terminal para que volviera a reconocer la estructura. Si tuviera que empezar este proyecto de nuevo, definitivamente haría algo diferente: sería muchísimo más cuidadoso al inicializar las carpetas desde el primer día y me aseguraría de revisar bien en qué rama estoy parado antes de ponerme a hacer cambios."
 
 ### Matias Pulgar
-<!-- 
-⚠️ IMPORTANTE: Esta sección debe ser escrita por Matias de forma genuina, 
-sin apoyo de herramientas de IA. Incluir:
-- Qué aprendí durante el semestre sobre DevOps
-- Cuál fue mi contribución principal al proyecto
-- Qué desafíos enfrenté y cómo los resolví
-- Qué haría diferente si empezara de nuevo
--->
-*[Pendiente — escribir reflexión personal sin uso de IA]*
+"A lo largo de este proyecto, aprendí muchísimo sobre cómo automatizar procesos; específicamente entendí cómo armar un buen pipeline de integración y despliegue continuo usando GitHub Actions y conectándolo con AWS para no tener que hacer las cosas a mano. Mi rol principal en este trabajo fue encargarme de la infraestructura y las herramientas de calidad: configuré la integración con SonarCloud, manejé los Secrets en GitHub de forma segura y configuré las reglas del Security Group en AWS.
 
----
+Uno de los desafíos técnicos más frustrantes que tuve que resolver fue cuando ya teníamos todo "listo" pero la página simplemente no cargaba en el navegador porque el puerto 5000 estaba bloqueado por el firewall. Pude solucionar este problema entrando directamente a la consola de AWS, editando el Security Group de la instancia y abriendo el puerto 5000 para permitir el tráfico de entrada. Si empezara de nuevo desde cero, me preocuparía de revisar las configuraciones por defecto que trae AWS Academy desde un inicio y, sobre todo, de leer bien los logs de error del pipeline con más calma en vez de intentar adivinar por qué fallaba."
 
 ## 👥 Integrantes
 

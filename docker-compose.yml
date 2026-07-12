@@ -8,6 +8,7 @@ version: '3.8'
 services:
   # ── Servicio principal: API de Tareas ──────────
   app:
+    image: ${DOCKER_IMAGE:-microservicio-tareas}:${TAG:-latest}
     build:
       context: .
       dockerfile: Dockerfile
@@ -22,7 +23,7 @@ services:
       - REDIS_PORT=6379
     depends_on:
       redis:
-        condition: service_healthy
+        condition: service_started
     networks:
       - tareas-network
     restart: unless-stopped
@@ -31,7 +32,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 15s
 
   # ── Servicio secundario: Redis (cache) ─────────
   redis:

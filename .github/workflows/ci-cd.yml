@@ -133,12 +133,13 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            set -e
             echo "🔄 Iniciando deploy..."
 
             # Navegar al directorio del proyecto
-            cd ~/microservicio-tareas || mkdir -p ~/microservicio-tareas && cd ~/microservicio-tareas
+            cd ~/microservicio-tareas || { mkdir -p ~/microservicio-tareas && cd ~/microservicio-tareas; }
 
-            # Actualizar código
+            # Actualizar código (necesitamos docker-compose.yml actualizado)
             if [ -d ".git" ]; then
               git pull origin main
             else
@@ -152,17 +153,31 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/microservicio-tareas:latest
 
             # Detener servicios anteriores
-            docker compose down --remove-orphans || true
+            docker compose down --remove-orphans 2>/dev/null || true
 
-            # Levantar servicios actualizados
-            docker compose up -d
+            # Exportar variable para que docker-compose use la imagen de Docker Hub
+            export DOCKER_IMAGE=${{ secrets.DOCKER_USERNAME }}/microservicio-tareas
+            export TAG=latest
 
-            # Verificar que los servicios están corriendo
-            sleep 10
+            # Levantar servicios (usa la imagen pre-construida, no hace build)
+            docker compose up -d --no-build
+
+            # Esperar a que los servicios arranquen
+            echo "⏳ Esperando que los servicios arranquen..."
+            sleep 15
+
+            # Diagnóstico
+            echo "📋 Estado de los contenedores:"
             docker compose ps
-            curl -f http://localhost:5000/health || echo "⚠️ Health check pendiente..."
 
-            echo "✅ Deploy completado exitosamente"
+            echo "📋 Logs recientes de la app:"
+            docker compose logs --tail=20 app
+
+            # Verificar health check
+            echo "🏥 Verificando health check..."
+            curl -sf http://localhost:5000/health && echo "" && echo "✅ Health check exitoso" || echo "⚠️ Health check falló — revisando logs..."
+
+            echo "✅ Deploy completado"
 
       - name: ✅ Verificación post-deploy
         run: |
