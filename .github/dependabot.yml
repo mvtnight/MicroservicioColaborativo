@@ -1,0 +1,44 @@
+# ── Dependabot — Escaneo automático de dependencias ──────
+# Revisa semanalmente si hay actualizaciones de seguridad
+# Documentación: https://docs.github.com/en/code-security/dependabot
+
+version: 2
+updates:
+  # Dependencias de Python (pip)
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "security"
+    commit-message:
+      prefix: "chore(deps):"
+
+  # GitHub Actions (versiones de actions)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "ci/cd"
+      - "dependencies"
+    commit-message:
+      prefix: "chore(ci):"
+
+  # Docker (imagen base)
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "docker"
+      - "dependencies"
+    commit-message:
+      prefix: "chore(docker):"

@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+
+# GitHub
+.github
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+.eggs
+dist
+build
+
+# Tests
+.pytest_cache
+.coverage
+htmlcov
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.yml
+docker-compose.override.yml
+
+# Docs
+README.md
+README.md~
+CONTRIBUTING.md
+LICENSE
+*.md~
