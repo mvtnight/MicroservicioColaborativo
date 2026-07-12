@@ -1,0 +1,62 @@
+# ───────────────────────────────────────────────────
+# docker-compose.yml — Orquestación de servicios
+# Microservicio de Tareas + Redis (cache/persistencia)
+# ───────────────────────────────────────────────────
+
+version: '3.8'
+
+services:
+  # ── Servicio principal: API de Tareas ──────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: microservicio-tareas
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - FLASK_DEBUG=false
+      - APP_VERSION=1.0.0
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - tareas-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # ── Servicio secundario: Redis (cache) ─────────
+  redis:
+    image: redis:7-alpine
+    container_name: tareas-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - tareas-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: redis-server --appendonly yes
+
+# ── Volúmenes persistentes ───────────────────────
+volumes:
+  redis-data:
+    driver: local
+
+# ── Red compartida ───────────────────────────────
+networks:
+  tareas-network:
+    driver: bridge
