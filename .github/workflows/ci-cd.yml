@@ -152,8 +152,11 @@ jobs:
               echo "✅ Docker Compose instalado: $(docker compose version)"
             fi
 
-            # ── Navegar al directorio del proyecto ──
-            cd ~/microservicio-tareas || { mkdir -p ~/microservicio-tareas && cd ~/microservicio-tareas; }
+            # ── Preparar directorio del proyecto ──
+            PROJECT_DIR="$HOME/microservicio-tareas"
+            mkdir -p "$PROJECT_DIR"
+            cd "$PROJECT_DIR"
+            echo "📁 Directorio actual: $(pwd)"
 
             # ── Actualizar código ──
             if [ -d ".git" ]; then
@@ -162,6 +165,10 @@ jobs:
               git clone https://github.com/gferrufino/MicroservicioColaborativo.git .
             fi
 
+            # ── Verificar que docker-compose.yml existe ──
+            echo "📋 Archivos en el directorio:"
+            ls -la docker-compose.yml || { echo "❌ docker-compose.yml NO encontrado"; exit 1; }
+
             # ── Login a Docker Hub ──
             echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
@@ -169,14 +176,14 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/microservicio-tareas:latest
 
             # ── Detener servicios anteriores ──
-            $COMPOSE_CMD down --remove-orphans 2>/dev/null || true
+            $COMPOSE_CMD -f docker-compose.yml down --remove-orphans 2>/dev/null || true
 
             # ── Exportar variables para docker-compose.yml ──
             export DOCKER_IMAGE=${{ secrets.DOCKER_USERNAME }}/microservicio-tareas
             export TAG=latest
 
             # ── Levantar servicios ──
-            $COMPOSE_CMD up -d --no-build
+            $COMPOSE_CMD -f docker-compose.yml up -d --no-build
 
             # ── Esperar arranque ──
             echo "⏳ Esperando que los servicios arranquen..."
@@ -184,10 +191,10 @@ jobs:
 
             # ── Diagnóstico ──
             echo "📋 Estado de los contenedores:"
-            $COMPOSE_CMD ps
+            $COMPOSE_CMD -f docker-compose.yml ps
 
             echo "📋 Logs recientes de la app:"
-            $COMPOSE_CMD logs --tail=20 app
+            $COMPOSE_CMD -f docker-compose.yml logs --tail=20 app
 
             # ── Verificar health check ──
             echo "🏥 Verificando health check..."
