@@ -136,46 +136,62 @@ jobs:
             set -e
             echo "🔄 Iniciando deploy..."
 
-            # Navegar al directorio del proyecto
+            # ── Verificar/instalar Docker Compose ──
+            if docker compose version > /dev/null 2>&1; then
+              COMPOSE_CMD="docker compose"
+              echo "✅ Docker Compose plugin detectado"
+            elif docker-compose --version > /dev/null 2>&1; then
+              COMPOSE_CMD="docker-compose"
+              echo "✅ Docker Compose standalone detectado"
+            else
+              echo "📦 Instalando Docker Compose plugin..."
+              sudo mkdir -p /usr/local/lib/docker/cli-plugins
+              sudo curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/lib/docker/cli-plugins/docker-compose
+              sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+              COMPOSE_CMD="docker compose"
+              echo "✅ Docker Compose instalado: $(docker compose version)"
+            fi
+
+            # ── Navegar al directorio del proyecto ──
             cd ~/microservicio-tareas || { mkdir -p ~/microservicio-tareas && cd ~/microservicio-tareas; }
 
-            # Actualizar código (necesitamos docker-compose.yml actualizado)
+            # ── Actualizar código ──
             if [ -d ".git" ]; then
               git pull origin main
             else
               git clone https://github.com/gferrufino/MicroservicioColaborativo.git .
             fi
 
-            # Login a Docker Hub
+            # ── Login a Docker Hub ──
             echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
-            # Pull de la última imagen
+            # ── Pull de la última imagen ──
             docker pull ${{ secrets.DOCKER_USERNAME }}/microservicio-tareas:latest
 
-            # Detener servicios anteriores
-            docker compose down --remove-orphans 2>/dev/null || true
+            # ── Detener servicios anteriores ──
+            $COMPOSE_CMD down --remove-orphans 2>/dev/null || true
 
-            # Exportar variable para que docker-compose use la imagen de Docker Hub
+            # ── Exportar variables para docker-compose.yml ──
             export DOCKER_IMAGE=${{ secrets.DOCKER_USERNAME }}/microservicio-tareas
             export TAG=latest
 
-            # Levantar servicios (usa la imagen pre-construida, no hace build)
-            docker compose up -d --no-build
+            # ── Levantar servicios ──
+            $COMPOSE_CMD up -d --no-build
 
-            # Esperar a que los servicios arranquen
+            # ── Esperar arranque ──
             echo "⏳ Esperando que los servicios arranquen..."
             sleep 15
 
-            # Diagnóstico
+            # ── Diagnóstico ──
             echo "📋 Estado de los contenedores:"
-            docker compose ps
+            $COMPOSE_CMD ps
 
             echo "📋 Logs recientes de la app:"
-            docker compose logs --tail=20 app
+            $COMPOSE_CMD logs --tail=20 app
 
-            # Verificar health check
+            # ── Verificar health check ──
             echo "🏥 Verificando health check..."
-            curl -sf http://localhost:5000/health && echo "" && echo "✅ Health check exitoso" || echo "⚠️ Health check falló — revisando logs..."
+            curl -sf http://localhost:5000/health && echo "" && echo "✅ Health check exitoso" || echo "⚠️ Health check falló"
 
             echo "✅ Deploy completado"
 
