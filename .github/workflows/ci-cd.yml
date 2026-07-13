@@ -44,13 +44,13 @@ jobs:
           pytest test_app.py -v --tb=short --cov=app --cov-report=xml:coverage.xml --cov-report=html:htmlcov --cov-report=term-missing --cov-fail-under=80
 
       - name: 📤 Subir reporte de cobertura (XML para SonarCloud)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-report
           path: coverage.xml
 
       - name: 📤 Subir reporte HTML de cobertura (equivalente a JaCoCo)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage-html-report
